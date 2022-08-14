@@ -71,4 +71,22 @@ const verify = async (req, res) => {
   }
 };
 
-export { register, authenticate, verify };
+const resetPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    const error = new Error("The Email does not exist");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  try {
+    user.token = generateId()
+    await user.save();
+    res.json({ msg: "We have sent you an email with the instructions" });
+  } catch (error) {
+    console.log(error)
+  }
+};
+
+export { register, authenticate, verify, resetPassword };
