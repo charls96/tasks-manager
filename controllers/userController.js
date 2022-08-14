@@ -32,24 +32,43 @@ const authenticate = async (req, res) => {
     return res.status(404).json({ msg: error.message });
   }
 
-  // Checks if a user is validated
-  if (!user.validated) {
+  // Checks if a user is verified
+  if (!user.verified) {
     const error = new Error("Your account is not verified");
     return res.status(403).json({ msg: error.message });
   }
 
   // Checks if the password of the user is correct
-  if(await user.checkPassword(password)){
+  if (await user.checkPassword(password)) {
     res.json({
-      _id: user._id,
+      /* _id: user._id, */
       name: user.name,
       email: user.email,
       token: generateJWT(user._id),
-    })
+    });
   } else {
     const error = new Error("Your password is incorrect");
     return res.status(403).json({ msg: error.message });
   }
 };
 
-export { register, authenticate };
+const verify = async (req, res) => {
+  const { token } = req.params;
+  const verifyUser = await User.findOne({ token });
+
+  if (!verifyUser) {
+    const error = new Error("Invalid token");
+    return res.status(403).json({ msg: error.message });
+  }
+
+  try {
+    verifyUser.verified = true;
+    verifyUser.token = "";
+    await verifyUser.save();
+    res.json({ msg: "User verified successfully" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { register, authenticate, verify };
