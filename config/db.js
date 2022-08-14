@@ -6,7 +6,7 @@ const connectDB = async () => {
       process.env.MONGO_URI, {
           useNewUrlParser: true,
           useUnifiedTopology: true,
-          dbName: "tasksManager"
+          dbName: process.env.DB_NAME
       }
     );
 
