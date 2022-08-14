@@ -81,11 +81,11 @@ const resetPassword = async (req, res) => {
   }
 
   try {
-    user.token = generateId()
+    user.token = generateId();
     await user.save();
     res.json({ msg: "We have sent you an email with the instructions" });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 };
 
@@ -93,14 +93,40 @@ const verifyToken = async (req, res) => {
   const { token } = req.params;
   const validToken = await User.findOne({ token });
 
-  if(validToken) {
+  if (validToken) {
     res.json({ msg: "Valid token and the user exists" });
   } else {
     const error = new Error("Token not valid");
     return res.status(404).json({ msg: error.message });
   }
-}
+};
 
+const newPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
 
+  const user = await User.findOne({ token });
 
-export { register, authenticate, verify, resetPassword, verifyToken };
+  if (user) {
+    user.password = password;
+    user.token = "";
+    try {
+      await user.save();
+      res.json({ msg: "Password modified successfully" });
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    const error = new Error("Token not valid");
+    return res.status(404).json({ msg: error.message });
+  }
+};
+
+export {
+  register,
+  authenticate,
+  verify,
+  resetPassword,
+  verifyToken,
+  newPassword,
+};

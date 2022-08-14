@@ -5,6 +5,7 @@ import {
   verify,
   resetPassword,
   verifyToken,
+  newPassword,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -14,6 +15,6 @@ router.post("/", register);
 router.post("/login", authenticate);
 router.get("/verify/:token", verify);
 router.post("/reset-password", resetPassword);
-router.get("/reset-password/:token", verifyToken)
+router.route("/reset-password/:token").get(verifyToken).post(newPassword);
 
 export default router;
